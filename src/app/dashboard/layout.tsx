@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DashboardHeader } from "@/components/dashboard/header";
 
 export default function DashboardLayout({
   children,
@@ -38,7 +39,12 @@ export default function DashboardLayout({
   return (
     <SidebarProvider>
       <DashboardSidebar />
-      <SidebarInset>{children}</SidebarInset>
+      <SidebarInset>
+        <DashboardHeader />
+        <main className="flex-1 overflow-y-auto pt-16">
+          {children}
+        </main>
+      </SidebarInset>
     </SidebarProvider>
   );
 }

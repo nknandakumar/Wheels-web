@@ -28,8 +28,8 @@ export default function MyLeadsPage() {
   }, [leads, searchTerm]);
 
   return (
-    <div className="flex flex-col h-full">
-      <header className="bg-card border-b p-4 flex justify-between items-center">
+    <div className="flex flex-col h-full p-6">
+      <header className="mb-6 flex justify-between items-center">
         <h1 className="text-2xl font-bold">My Leads</h1>
         <div className="w-full max-w-sm">
           <Input
@@ -39,7 +39,7 @@ export default function MyLeadsPage() {
           />
         </div>
       </header>
-      <main className="flex-1 overflow-y-auto p-6">
+      <main className="flex-1">
         {loading ? (
           <p>Loading leads...</p>
         ) : (

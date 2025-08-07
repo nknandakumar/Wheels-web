@@ -39,12 +39,12 @@ export default function EditLeadPage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="flex flex-col h-full">
-      <header className="bg-card border-b p-4">
+    <div className="flex flex-col h-full p-6">
+      <header className="mb-6">
         <h1 className="text-2xl font-bold">Edit Lead</h1>
         <p className="text-muted-foreground">Editing lead for: {lead?.name}</p>
       </header>
-      <main className="flex-1 overflow-y-auto p-6">
+      <main className="flex-1">
         {lead && <NewLeadForm lead={lead} />}
       </main>
     </div>
