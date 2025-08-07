@@ -16,7 +16,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { FormSelect, FormInput } from "./form-helpers";
-import { handleDataQualityCheck } from "@/app/dashboard/new-lead/actions";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 interface NewLeadFormProps {
@@ -27,7 +26,6 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [aiFeedback, setAiFeedback] = useState<{ loanAmountIssue?: string; addressIssue?: string } | null>(null);
 
   const form = useForm<Lead>({
     resolver: zodResolver(LeadSchema),
@@ -132,47 +130,8 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
     }
   };
   
-  const checkDataQuality = async (field: 'loanAmount' | 'address') => {
-    const loanAmount = form.getValues("loanAmount");
-    const address = form.getValues("permanentAddressLandmark");
-
-    if (field === 'loanAmount' && (!loanAmount || loanAmount <= 0)) return;
-    if (field === 'address' && !address) return;
-
-    const allLeads = getLeads();
-    const historicalLoanAmounts = allLeads.map(l => l.loanAmount).filter(a => a > 0);
-    const historicalAddresses = allLeads.map(l => l.permanentAddressLandmark).filter(Boolean);
-
-    const result = await handleDataQualityCheck({
-        loanAmount: loanAmount,
-        address: address,
-        historicalLoanAmounts,
-        historicalAddresses,
-    });
-
-    if (result.loanAmountIssue || result.addressIssue) {
-        setAiFeedback(result);
-    }
-  };
-
-
   return (
     <>
-     <AlertDialog open={!!aiFeedback} onOpenChange={() => setAiFeedback(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Potential Data Inconsistency</AlertDialogTitle>
-            <AlertDialogDescription>
-              {aiFeedback?.loanAmountIssue && <p className="mb-2">{aiFeedback.loanAmountIssue}</p>}
-              {aiFeedback?.addressIssue && <p>{aiFeedback.addressIssue}</p>}
-              <p className="mt-4">Please review the entered data. You can proceed if you are sure it's correct.</p>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setAiFeedback(null)}>Acknowledge</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -196,7 +155,7 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
                 <FormInput control={form.control} name="altMobileNo" label="ALT MOBILE NO" placeholder="10-digit number" type="tel" />
                 <FormInput control={form.control} name="email" label="EMAIL ID" placeholder="example@mail.com" type="email" onChange={(e) => e.target.value = e.target.value.toLowerCase()} />
                 <FormInput control={form.control} name="motherName" label="MOTHER NAME" placeholder="Mother's Name" />
-                <FormInput control={form.control} name="loanAmount" label="LOAN AMOUNT" placeholder="Enter amount" type="number" onBlur={() => checkDataQuality('loanAmount')} />
+                <FormInput control={form.control} name="loanAmount" label="LOAN AMOUNT" placeholder="Enter amount" type="number" />
                 <FormSelect control={form.control} name="dsa" label="DSA" placeholder="Select DSA" options={Constants.DSAS} />
             </CardContent>
         </Card>
@@ -257,7 +216,7 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
                     <h3 className="font-semibold mb-2">Permanent Address</h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <FormSelect control={form.control} name="permanentAddressType" label="ADDRESS" placeholder="Select proof" options={Constants.ADDRESS_PROOFS} />
-                        <FormInput control={form.control} name="permanentAddressLandmark" label="NEAR LAND MARK" placeholder="e.g., Near City Park" onBlur={() => checkDataQuality('address')} />
+                        <FormInput control={form.control} name="permanentAddressLandmark" label="NEAR LAND MARK" placeholder="e.g., Near City Park" />
                         <FormSelect control={form.control} name="permanentAddressCategory" label="CATEGORY" placeholder="Select category" options={Constants.ADDRESS_CATEGORIES} />
                     </div>
                 </div>

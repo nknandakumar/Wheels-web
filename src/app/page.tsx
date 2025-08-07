@@ -35,24 +35,21 @@ export default function LoginPage() {
 
   const onSubmit = (data: LoginFormValues) => {
     setLoading(true);
-    // Simulate network delay
-    setTimeout(() => {
-      if (data.username === "abhishek_m" && data.password === "Abhi@571") {
-        localStorage.setItem("isAuthenticated", "true");
-        toast({
-          title: "Login Successful",
-          description: "Welcome to Wheels Web!",
-        });
-        router.push("/dashboard");
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Login Failed",
-          description: "Invalid username or password.",
-        });
-        setLoading(false);
-      }
-    }, 500);
+    if (data.username === "abhishek_m" && data.password === "Abhi@571") {
+      localStorage.setItem("isAuthenticated", "true");
+      toast({
+        title: "Login Successful",
+        description: "Welcome to Wheels Web!",
+      });
+      router.push("/dashboard");
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: "Invalid username or password.",
+      });
+      setLoading(false);
+    }
   };
 
   return (
