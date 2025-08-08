@@ -2,63 +2,110 @@
 
 import type { Lead, Disbursement } from "./schemas";
 
-const LEADS_KEY = "wheels-web-leads";
-const DISBURSEMENTS_KEY = "wheels-web-disbursements";
-const LOAN_ID_KEY = "wheels-web-loan-id-counter";
+const LEADS_SCRIPT_URL =
+	"https://script.google.com/macros/s/AKfycbxjI6yQZ6bTZIcZN7WCwQyf1mHlgxCXcdYCQQD9zsp7FdHc9ycXEfbWxpI16jmhVdBGNg/exec";
+const DISBURSEMENTS_SCRIPT_URL =
+	"https://script.google.com/macros/s/AKfycbzikdCPoavnrfXXuzQuQUGCA1iN3UodBsXQBeP78K3-LCEfFhRrHGqVOfLob3kx0ge9Cg/exec";
 
 // --- Loan ID ---
 export const getNextLoanId = (): string => {
-  if (typeof window === "undefined") return "202500001";
-  const currentCounter = parseInt(localStorage.getItem(LOAN_ID_KEY) || "202500000", 10);
-  const nextCounter = currentCounter + 1;
-  localStorage.setItem(LOAN_ID_KEY, nextCounter.toString());
-  return nextCounter.toString();
+	// You may want to generate this on the client only, or use a different approach
+	return Date.now().toString();
 };
 
 // --- Leads ---
-export const getLeads = (): Lead[] => {
-  if (typeof window === "undefined") return [];
-  const data = localStorage.getItem(LEADS_KEY);
-  return data ? JSON.parse(data) : [];
+export const getLeads = async (offset = 0, limit = 50): Promise<Lead[]> => {
+	const response = await fetch(LEADS_SCRIPT_URL);
+	if (!response.ok) {
+		throw new Error("Failed to fetch leads");
+	}
+	const allLeads = await response.json();
+	return allLeads.slice(offset, offset + limit);
 };
 
-export const getLeadById = (id: string): Lead | undefined => {
-  const leads = getLeads();
-  return leads.find((lead) => lead.id === id);
+export const getLeadsCount = async (): Promise<number> => {
+	const response = await fetch(LEADS_SCRIPT_URL);
+	if (!response.ok) {
+		throw new Error("Failed to fetch leads count");
+	}
+	const allLeads = await response.json();
+	return allLeads.length || 0;
 };
 
-export const saveLead = (lead: Lead): void => {
-  const leads = getLeads();
-  leads.unshift(lead); // Add new lead to the top
-  localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
+export const getLeadById = async (id: string): Promise<Lead | undefined> => {
+	const leads = await getLeads(0, Number.MAX_SAFE_INTEGER);
+	return leads.find((lead) => lead.id === id);
 };
 
-export const updateLead = (updatedLead: Lead): void => {
-  let leads = getLeads();
-  leads = leads.map((lead) => (lead.id === updatedLead.id ? updatedLead : lead));
-  localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
+export const saveLead = async (lead: Lead): Promise<void> => {
+	const response = await fetch(LEADS_SCRIPT_URL, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(lead),
+	});
+	if (!response.ok) {
+		throw new Error("Failed to save lead");
+	}
+};
+
+export const updateLead = async (updatedLead: Lead): Promise<void> => {
+	// Not supported with Apps Script; implement if you add update logic to your script
+	throw new Error(
+		"Update lead is not supported with current Apps Script setup."
+	);
 };
 
 // --- Disbursements ---
-export const getDisbursements = (): Disbursement[] => {
-  if (typeof window === "undefined") return [];
-  const data = localStorage.getItem(DISBURSEMENTS_KEY);
-  return data ? JSON.parse(data) : [];
+export const getDisbursements = async (
+	offset = 0,
+	limit = 50
+): Promise<Disbursement[]> => {
+	const response = await fetch(DISBURSEMENTS_SCRIPT_URL);
+	if (!response.ok) {
+		throw new Error("Failed to fetch disbursements");
+	}
+	const allDisbursements = await response.json();
+	return allDisbursements.slice(offset, offset + limit);
 };
 
-export const getDisbursementById = (id: string): Disbursement | undefined => {
-  const disbursements = getDisbursements();
-  return disbursements.find((d) => d.id === id);
+export const getDisbursementsCount = async (): Promise<number> => {
+	const response = await fetch(DISBURSEMENTS_SCRIPT_URL);
+	if (!response.ok) {
+		throw new Error("Failed to fetch disbursements count");
+	}
+	const allDisbursements = await response.json();
+	return allDisbursements.length || 0;
 };
 
-export const saveDisbursement = (disbursement: Disbursement): void => {
-  const disbursements = getDisbursements();
-  disbursements.unshift(disbursement);
-  localStorage.setItem(DISBURSEMENTS_KEY, JSON.stringify(disbursements));
+export const getDisbursementById = async (
+	id: string
+): Promise<Disbursement | undefined> => {
+	const disbursements = await getDisbursements(0, Number.MAX_SAFE_INTEGER);
+	return disbursements.find((d) => d.id === id);
 };
 
-export const updateDisbursement = (updatedDisbursement: Disbursement): void => {
-  let disbursements = getDisbursements();
-  disbursements = disbursements.map((d) => (d.id === updatedDisbursement.id ? updatedDisbursement : d));
-  localStorage.setItem(DISBURSEMENTS_KEY, JSON.stringify(disbursements));
+export const saveDisbursement = async (
+	disbursement: Disbursement
+): Promise<void> => {
+	const response = await fetch(DISBURSEMENTS_SCRIPT_URL, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(disbursement),
+	});
+	if (!response.ok) {
+		throw new Error("Failed to save disbursement");
+	}
+};
+
+export const updateDisbursement = async (
+	updatedDisbursement: Disbursement
+): Promise<void> => {
+	// Not supported with Apps Script; implement if you add update logic to your script
+	throw new Error(
+		"Update disbursement is not supported with current Apps Script setup."
+	);
 };
