@@ -1,127 +1,90 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getLeads, getDisbursements } from "@/lib/data";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { UserPlus, Users, CircleDollarSign, ClipboardList } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { ActionCard } from "@/components/dashboard/action-card";
 
 export default function DashboardPage() {
-	const [leadsCount, setLeadsCount] = useState(0);
-	const [disbursementsCount, setDisbursementsCount] = useState(0);
-	const [loading, setLoading] = useState(true);
 	const router = useRouter();
 
-	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				setLoading(true);
-				const [leads, disbursements] = await Promise.all([
-					getLeads(0, 1), // Just get count
-					getDisbursements(0, 1), // Just get count
-				]);
-
-				// Get total counts
-				const [leadsData, disbursementsData] = await Promise.all([
-					fetch(
-						"https://script.google.com/macros/s/AKfycbxjI6yQZ6bTZIcZN7WCwQyf1mHlgxCXcdYCQQD9zsp7FdHc9ycXEfbWxpI16jmhVdBGNg/exec"
-					),
-					fetch(
-						"https://script.google.com/macros/s/AKfycbzikdCPoavnrfXXuzQuQUGCA1iN3UodBsXQBeP78K3-LCEfFhRrHGqVOfLob3kx0ge9Cg/exec"
-					),
-				]);
-
-				const leadsJson = await leadsData.json();
-				const disbursementsJson = await disbursementsData.json();
-
-				setLeadsCount(leadsJson.length || 0);
-				setDisbursementsCount(disbursementsJson.length || 0);
-			} catch (error) {
-				console.error("Error fetching dashboard data:", error);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		fetchData();
-	}, []);
-
-	if (loading) {
-		return (
-			<div className="flex flex-col h-full p-6">
-				<h1 className="text-2xl font-bold mb-6">Dashboard</h1>
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-					<Card>
-						<CardHeader>
-							<CardTitle>Loading...</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<p>Fetching data from Google Sheets...</p>
-						</CardContent>
-					</Card>
-				</div>
-			</div>
-		);
-	}
+	const handleLogout = () => {
+		if (typeof window !== "undefined") {
+			localStorage.removeItem("isAuthenticated");
+		}
+		router.replace("/");
+	};
 
 	return (
-		<div className="flex flex-col h-full p-6">
-			<h1 className="text-2xl font-bold mb-6">Dashboard</h1>
-			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-				<Card>
-					<CardHeader>
-						<CardTitle>Total Leads</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<div className="text-3xl font-bold text-primary">{leadsCount}</div>
-						<p className="text-muted-foreground">
-							Total leads in Google Sheets
-						</p>
-						<Button
-							className="mt-4"
-							onClick={() => router.push("/dashboard/my-leads")}
-						>
-							View All Leads
-						</Button>
-					</CardContent>
-				</Card>
+		<div className="min-h-screen flex flex-col">
+			<header className="sticky top-0 z-10 border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+				<div className="mx-auto w-full max-w-6xl px-4 py-3 flex items-center justify-between">
+					<div className="text-lg sm:text-xl font-semibold tracking-tight">
+						Wheels Web
+					</div>
+					<Button
+						variant="outline"
+						className="bg-black text-white hover:bg-gray-800 hover:text-white rounded-full px-4 py-2 h-9"
+						onClick={handleLogout}
+					>
+						Logout
+					</Button>
+				</div>
+			</header>
 
-				<Card>
-					<CardHeader>
-						<CardTitle>Total Disbursements</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<div className="text-3xl font-bold text-primary">
-							{disbursementsCount}
-						</div>
-						<p className="text-muted-foreground">
-							Total disbursements in Google Sheets
-						</p>
-						<Button
-							className="mt-4"
-							onClick={() => router.push("/dashboard/my-disbursements")}
-						>
-							View All Disbursements
-						</Button>
-					</CardContent>
-				</Card>
-			</div>
+			<main className="flex-1">
+				<div className="mx-auto w-full max-w-6xl px-4 py-10">
+					<div className="flex flex-col justify-center items-center space-y-2 mb-10">
+						<h1 className="text-4xl sm:text-3xl md:text-6xl lg:text-7xl  text-center font-bold tracking-tight">
+							Wheels Web
+						</h1>
+						<h2 className="text-center md:text-lg lg:text-xl mb-4">
+							Store and Track customer leads and loan disbursements all in one
+							convenient place
+						</h2>
+					</div>
+					{(() => {
+						const actions = [
+							{
+								title: "New Lead",
+								description: "Create a new lead record",
+								href: "/dashboard/new-lead",
+								Icon: UserPlus,
+								ctaLabel: "Create",
+							},
+							{
+								title: "My Leads",
+								description: "Browse and manage leads",
+								href: "/dashboard/my-leads",
+								Icon: Users,
+								ctaLabel: "Open",
+							},
+							{
+								title: "New Disbursement",
+								description: "Create a new disbursement",
+								href: "/dashboard/new-disbursement",
+								Icon: CircleDollarSign,
+								ctaLabel: "Create",
+							},
+							{
+								title: "My Disbursements",
+								description: "Review past disbursements",
+								href: "/dashboard/my-disbursements",
+								Icon: ClipboardList,
+								ctaLabel: "Open",
+							},
+						];
 
-			<div className="mt-6">
-				<Card>
-					<CardHeader>
-						<CardTitle>Quick Actions</CardTitle>
-					</CardHeader>
-					<CardContent className="flex gap-4">
-						<Button onClick={() => router.push("/dashboard/new-lead")}>
-							Add New Lead
-						</Button>
-						<Button onClick={() => router.push("/dashboard/new-disbursement")}>
-							Add New Disbursement
-						</Button>
-					</CardContent>
-				</Card>
-			</div>
+						return (
+							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 place-items-stretch">
+								{actions.map((action) => (
+									<ActionCard key={action.title} {...action} />
+								))}
+							</div>
+						);
+					})()}
+				</div>
+			</main>
 		</div>
 	);
 }

@@ -28,7 +28,13 @@ import {
 	FormControl,
 	FormMessage,
 } from "@/components/ui/form";
-import { FormSelect, FormInput } from "./form-helpers";
+import {
+	FormSelect,
+	FormInput,
+	FormPanInput,
+	FormMobileInput,
+	FormDateInput,
+} from "./form-helpers";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -102,6 +108,9 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 		},
 	});
 
+	const [loanIdType, setLoanIdType] = useState<"manual" | "auto">("auto");
+	const [currentDate] = useState(new Date().toLocaleDateString());
+
 	const { watch, setValue } = form;
 
 	const isCurrentAddressSame = watch("isCurrentAddressSame");
@@ -113,10 +122,12 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 
 	useEffect(() => {
 		if (!lead) {
-			setValue("loanId", getNextLoanId());
-			setValue("dateTime", new Date().toLocaleString());
+			if (loanIdType === "auto") {
+				setValue("loanId", getNextLoanId());
+			}
+			setValue("dateTime", currentDate);
 		}
-	}, [lead, setValue]);
+	}, [lead, setValue, loanIdType, currentDate]);
 
 	useEffect(() => {
 		if (isCurrentAddressSame) {
@@ -165,11 +176,45 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 		}
 	};
 
+	// Helper to add 'None' as the first option for dropdowns
+	const withNone = (options: { label: string; value: string }[]) => [{ label: "None", value: "none" }, ...options];
+
 	return (
 		<>
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 					<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+						<div className="space-y-2">
+							<FormLabel className="text-black font-medium">
+								LOAN ID TYPE
+							</FormLabel>
+							<div className="flex gap-4">
+								<label className="flex items-center space-x-2">
+									<input
+										type="radio"
+										value="auto"
+										checked={loanIdType === "auto"}
+										onChange={(e) =>
+											setLoanIdType(e.target.value as "manual" | "auto")
+										}
+										className="text-green-500 focus:ring-green-500"
+									/>
+									<span>Auto Generated</span>
+								</label>
+								<label className="flex items-center space-x-2">
+									<input
+										type="radio"
+										value="manual"
+										checked={loanIdType === "manual"}
+										onChange={(e) =>
+											setLoanIdType(e.target.value as "manual" | "auto")
+										}
+										className="text-green-500 focus:ring-green-500"
+									/>
+									<span>Manual</span>
+								</label>
+							</div>
+						</div>
 						<FormField
 							control={form.control}
 							name="loanId"
@@ -177,7 +222,11 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 								<FormItem>
 									<FormLabel>LOAN ID</FormLabel>
 									<FormControl>
-										<Input {...field} readOnly className="bg-muted" />
+										<Input
+											{...field}
+											readOnly={loanIdType === "auto"}
+											className={`$${loanIdType === "auto" ? "bg-gray-100" : "bg-white"} border-gray-300 focus:border-green-500 focus:ring-green-500 focus:ring-1`}
+										/>
 									</FormControl>
 								</FormItem>
 							)}
@@ -187,9 +236,13 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 							name="dateTime"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>DATE & TIME</FormLabel>
+									<FormLabel>DATE</FormLabel>
 									<FormControl>
-										<Input {...field} readOnly className="bg-muted" />
+										<Input
+											{...field}
+											readOnly
+											className="bg-gray-100 border-gray-300 focus:border-green-500 focus:ring-green-500 focus:ring-1"
+										/>
 									</FormControl>
 								</FormItem>
 							)}
@@ -199,14 +252,14 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 							name="source"
 							label="SOURCE"
 							placeholder="Select source"
-							options={Constants.SOURCES}
+							options={withNone(Constants.SOURCES)}
 						/>
 						<FormSelect
 							control={form.control}
 							name="stage"
 							label="STAGE"
 							placeholder="Select stage"
-							options={Constants.STAGES}
+							options={withNone(Constants.STAGES)}
 						/>
 					</div>
 
@@ -221,7 +274,7 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 								name="profileType"
 								label="TYPE"
 								placeholder="Select type"
-								options={Constants.PROFILE_TYPES}
+								options={withNone(Constants.PROFILE_TYPES)}
 							/>
 							<FormInput
 								control={form.control}
@@ -237,44 +290,39 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 								name="gender"
 								label="GENDER"
 								placeholder="Select gender"
-								options={Constants.GENDERS}
+								options={withNone(Constants.GENDERS)}
 							/>
 							<FormSelect
 								control={form.control}
 								name="customerProfile"
 								label="CUSTOMER PROFILE"
 								placeholder="Select profile"
-								options={Constants.CUSTOMER_PROFILES}
+								options={withNone(Constants.CUSTOMER_PROFILES)}
 							/>
 							<FormSelect
 								control={form.control}
 								name="maritalStatus"
 								label="MARITAL STATUS"
 								placeholder="Select status"
-								options={Constants.MARITAL_STATUSES}
+								options={withNone(Constants.MARITAL_STATUSES)}
 							/>
-							<FormInput
+							<FormPanInput
 								control={form.control}
 								name="panNo"
 								label="PAN NO"
 								placeholder="ABCDE1234F"
-								onChange={(e) =>
-									(e.target.value = e.target.value.toUpperCase())
-								}
 							/>
-							<FormInput
+							<FormMobileInput
 								control={form.control}
 								name="mobileNo"
 								label="MOBILE NO"
 								placeholder="10-digit number"
-								type="tel"
 							/>
-							<FormInput
+							<FormMobileInput
 								control={form.control}
 								name="altMobileNo"
 								label="ALT MOBILE NO"
 								placeholder="10-digit number"
-								type="tel"
 							/>
 							<FormInput
 								control={form.control}
@@ -304,64 +352,25 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 								name="dsa"
 								label="DSA"
 								placeholder="Select DSA"
-								options={Constants.DSAS}
+								options={withNone(Constants.DSAS)}
 							/>
 						</CardContent>
 					</Card>
 
-					{/* Other sections... */}
+					{/* Vehicle & Ref Contact & Nominee Information */}
 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 						<Card>
 							<CardHeader>
 								<CardTitle>Vehicle Information</CardTitle>
 							</CardHeader>
 							<CardContent className="space-y-4">
-								<FormInput
-									control={form.control}
-									name="rcNo"
-									label="RC NO"
-									placeholder="Vehicle RC No."
-								/>
-								<FormInput
-									control={form.control}
-									name="vehicleVerient"
-									label="VEHICLE / VERIENT"
-									placeholder="e.g., Maruti Suzuki Swift VXi"
-								/>
-								<FormSelect
-									control={form.control}
-									name="mfgYear"
-									label="MFG YEAR"
-									placeholder="Select year"
-									options={Constants.MFG_YEARS}
-								/>
-								<FormSelect
-									control={form.control}
-									name="osNo"
-									label="O. S NO"
-									placeholder="Select O.S No"
-									options={Constants.OS_NOS}
-								/>
-								<FormInput
-									control={form.control}
-									name="kilometreReading"
-									label="KILOMETRE READING"
-									placeholder="e.g., 50000"
-									type="number"
-								/>
-								<FormInput
-									control={form.control}
-									name="vehicleOwnerContactNo"
-									label="VEHICLE OWNER CONTACT NO"
-									placeholder="10-digit number"
-									type="tel"
-								/>
-								<FormInput
-									control={form.control}
-									name="vehicleLocation"
-									label="VEHICLE LOCATION"
-									placeholder="City or Area"
-								/>
+								<FormInput control={form.control} name="rcNo" label="RC NO" placeholder="Vehicle RC No." />
+								<FormInput control={form.control} name="vehicleVerient" label="VEHICLE / VERIENT" placeholder="e.g., Maruti Suzuki Swift VXi" />
+								<FormSelect control={form.control} name="mfgYear" label="MFG YEAR" placeholder="Select year" options={withNone(Constants.MFG_YEARS)} />
+								<FormSelect control={form.control} name="osNo" label="O. S NO" placeholder="Select O.S No" options={withNone(Constants.OS_NOS)} />
+								<FormInput control={form.control} name="kilometreReading" label="KILOMETRE READING" placeholder="e.g., 50000" type="number" />
+								<FormMobileInput control={form.control} name="vehicleOwnerContactNo" label="VEHICLE OWNER CONTACT NO" placeholder="10-digit number" />
+								<FormInput control={form.control} name="vehicleLocation" label="VEHICLE LOCATION" placeholder="City or Area" />
 							</CardContent>
 						</Card>
 						<Card>
@@ -369,107 +378,26 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 								<CardTitle>Ref Contact Information</CardTitle>
 							</CardHeader>
 							<CardContent className="space-y-4">
-								<FormInput
-									control={form.control}
-									name="refFirstName"
-									label="FIRST NAME"
-									placeholder="Reference 1 Name"
-								/>
-								<FormInput
-									control={form.control}
-									name="refFirstMobNo"
-									label="FIRST MOB NO"
-									placeholder="Reference 1 Mobile"
-								/>
-								<FormInput
-									control={form.control}
-									name="refSecondName"
-									label="SECOND NAME"
-									placeholder="Reference 2 Name"
-								/>
-								<FormInput
-									control={form.control}
-									name="refSecondMobNo"
-									label="SECOND MOB NO"
-									placeholder="Reference 2 Mobile"
-								/>
-							</CardContent>
-						</Card>
-						<Card>
-							<CardHeader>
-								<CardTitle>Nominee Information</CardTitle>
-							</CardHeader>
-							<CardContent className="space-y-4">
-								<FormInput
-									control={form.control}
-									name="nomineeName"
-									label="NOMINEE NAME"
-									placeholder="Nominee's full name"
-								/>
-								<FormInput
-									control={form.control}
-									name="nomineeDob"
-									label="NOMINEE Date of Birth"
-									placeholder="DD-MM-YYYY"
-									type="date"
-								/>
-								<FormSelect
-									control={form.control}
-									name="nomineeRelationship"
-									label="RELATIONSHIP"
-									placeholder="Select relationship"
-									options={Constants.RELATIONSHIPS}
-								/>
-							</CardContent>
-						</Card>
-						<Card>
-							<CardHeader>
-								<CardTitle>Bank / Finance Information</CardTitle>
-							</CardHeader>
-							<CardContent className="space-y-4">
-								<FormSelect
-									control={form.control}
-									name="bankFinance"
-									label="BANK / FINANCE"
-									placeholder="Select Bank"
-									options={Constants.BANKS}
-								/>
-								<FormInput
-									control={form.control}
-									name="branch"
-									label="BRANCH"
-									placeholder="Bank Branch"
-								/>
-								<FormInput
-									control={form.control}
-									name="loginExecutiveName"
-									label="LOGIN EXECUTIVE NAME"
-									placeholder="Executive's Name"
-								/>
-							</CardContent>
-						</Card>
-						<Card>
-							<CardHeader>
-								<CardTitle>Dealer Information</CardTitle>
-							</CardHeader>
-							<CardContent className="space-y-4">
-								<FormInput
-									control={form.control}
-									name="caseDealer"
-									label="CASE DEALER"
-									placeholder="Dealer Name"
-								/>
-								<FormInput
-									control={form.control}
-									name="refNameMobNo"
-									label="REF NAME & MOB NO"
-									placeholder="Reference Name & Mobile"
-								/>
+								<FormInput control={form.control} name="refFirstName" label="FIRST NAME" placeholder="Reference 1 Name" />
+								<FormMobileInput control={form.control} name="refFirstMobNo" label="FIRST MOB NO" placeholder="Reference 1 Mobile" />
+								<FormInput control={form.control} name="refSecondName" label="SECOND NAME" placeholder="Reference 2 Name" />
+								<FormMobileInput control={form.control} name="refSecondMobNo" label="SECOND MOB NO" placeholder="Reference 2 Mobile" />
 							</CardContent>
 						</Card>
 					</div>
 
-					{/* Addresses */}
+					<Card>
+						<CardHeader>
+							<CardTitle>Nominee Information</CardTitle>
+						</CardHeader>
+						<CardContent className="space-y-4">
+							<FormInput control={form.control} name="nomineeName" label="NOMINEE NAME" placeholder="Nominee's full name" />
+							<FormDateInput control={form.control} name="nomineeDob" label="NOMINEE Date of Birth" placeholder="DD/MM/YYYY" />
+							<FormSelect control={form.control} name="nomineeRelationship" label="RELATIONSHIP" placeholder="Select relationship" options={withNone(Constants.RELATIONSHIPS)} />
+						</CardContent>
+					</Card>
+
+					{/* Address Information (moved up) */}
 					<Card>
 						<CardHeader>
 							<CardTitle>Address Information</CardTitle>
@@ -478,26 +406,9 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 							<div>
 								<h3 className="font-semibold mb-2">Permanent Address</h3>
 								<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-									<FormSelect
-										control={form.control}
-										name="permanentAddressType"
-										label="ADDRESS"
-										placeholder="Select proof"
-										options={Constants.ADDRESS_PROOFS}
-									/>
-									<FormInput
-										control={form.control}
-										name="permanentAddressLandmark"
-										label="NEAR LAND MARK"
-										placeholder="e.g., Near City Park"
-									/>
-									<FormSelect
-										control={form.control}
-										name="permanentAddressCategory"
-										label="CATEGORY"
-										placeholder="Select category"
-										options={Constants.ADDRESS_CATEGORIES}
-									/>
+									<FormSelect control={form.control} name="permanentAddressType" label="ADDRESS" placeholder="Select proof" options={withNone(Constants.ADDRESS_PROOFS)} />
+									<FormInput control={form.control} name="permanentAddressLandmark" label="NEAR LAND MARK" placeholder="e.g., Near City Park" />
+									<FormSelect control={form.control} name="permanentAddressCategory" label="CATEGORY" placeholder="Select category" options={withNone(Constants.ADDRESS_CATEGORIES)} />
 								</div>
 							</div>
 							<div>
@@ -507,39 +418,17 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 									render={({ field }) => (
 										<FormItem className="flex flex-row items-start space-x-3 space-y-0">
 											<FormControl>
-												<Checkbox
-													checked={field.value}
-													onCheckedChange={field.onChange}
-												/>
+												<Checkbox checked={field.value} onCheckedChange={field.onChange} />
 											</FormControl>
-											<FormLabel className="font-normal">
-												Is Current address same as Permanent Address?
-											</FormLabel>
+											<FormLabel className="font-normal">Is Current address same as Permanent Address?</FormLabel>
 										</FormItem>
 									)}
 								/>
 								{!isCurrentAddressSame && (
 									<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 p-4 border rounded-md">
-										<FormSelect
-											control={form.control}
-											name="currentAddressType"
-											label="ADDRESS"
-											placeholder="Select proof"
-											options={Constants.ADDRESS_PROOFS}
-										/>
-										<FormInput
-											control={form.control}
-											name="currentAddressLandmark"
-											label="NEAR LAND MARK"
-											placeholder="e.g., Near City Park"
-										/>
-										<FormSelect
-											control={form.control}
-											name="currentAddressCategory"
-											label="CATEGORY"
-											placeholder="Select category"
-											options={Constants.ADDRESS_CATEGORIES}
-										/>
+										<FormSelect control={form.control} name="currentAddressType" label="ADDRESS" placeholder="Select proof" options={withNone(Constants.ADDRESS_PROOFS)} />
+										<FormInput control={form.control} name="currentAddressLandmark" label="NEAR LAND MARK" placeholder="e.g., Near City Park" />
+										<FormSelect control={form.control} name="currentAddressCategory" label="CATEGORY" placeholder="Select category" options={withNone(Constants.ADDRESS_CATEGORIES)} />
 									</div>
 								)}
 							</div>
@@ -551,39 +440,18 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 									render={({ field }) => (
 										<FormItem className="flex flex-row items-start space-x-3 space-y-0 mb-4">
 											<FormControl>
-												<Checkbox
-													checked={field.value}
-													onCheckedChange={field.onChange}
-												/>
+												<Checkbox checked={field.value} onCheckedChange={field.onChange} />
 											</FormControl>
-											<FormLabel className="font-normal">
-												Is Office address same as Permanent Address?
-											</FormLabel>
+											<FormLabel className="font-normal">Is Office address same as Permanent Address?</FormLabel>
 										</FormItem>
 									)}
 								/>
 								<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-									<FormInput
-										control={form.control}
-										name="employmentDetail"
-										label="EMPLOYMENT DETAIL"
-										placeholder="e.g., Software Engineer at XYZ"
-									/>
+									<FormInput control={form.control} name="employmentDetail" label="EMPLOYMENT DETAIL" placeholder="e.g., Software Engineer at XYZ" />
 									{!isOfficeAddressSame && (
 										<>
-											<FormSelect
-												control={form.control}
-												name="officeAddressType"
-												label="ADDRESS"
-												placeholder="Select proof"
-												options={Constants.ADDRESS_PROOFS}
-											/>
-											<FormInput
-												control={form.control}
-												name="officeAddressLandmark"
-												label="NEAR LAND MARK"
-												placeholder="e.g., Tech Park"
-											/>
+											<FormSelect control={form.control} name="officeAddressType" label="ADDRESS" placeholder="Select proof" options={withNone(Constants.ADDRESS_PROOFS)} />
+											<FormInput control={form.control} name="officeAddressLandmark" label="NEAR LAND MARK" placeholder="e.g., Tech Park" />
 										</>
 									)}
 								</div>
@@ -591,7 +459,30 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 						</CardContent>
 					</Card>
 
-					{/* Remarks */}
+					{/* Bank / Finance Information (moved after Address) */}
+					<Card>
+						<CardHeader>
+							<CardTitle>Bank / Finance Information</CardTitle>
+						</CardHeader>
+						<CardContent className="space-y-4">
+							<FormSelect control={form.control} name="bankFinance" label="BANK / FINANCE" placeholder="Select Bank" options={withNone(Constants.BANKS)} />
+							<FormInput control={form.control} name="branch" label="BRANCH" placeholder="Bank Branch" />
+							<FormInput control={form.control} name="loginExecutiveName" label="LOGIN EXECUTIVE NAME" placeholder="Executive's Name" />
+						</CardContent>
+					</Card>
+
+					{/* Dealer Information (moved after Bank/Finance) */}
+					<Card>
+						<CardHeader>
+							<CardTitle>Dealer Information</CardTitle>
+						</CardHeader>
+						<CardContent className="space-y-4">
+							<FormInput control={form.control} name="caseDealer" label="CASE DEALER" placeholder="Dealer Name" />
+							<FormInput control={form.control} name="refNameMobNo" label="REF NAME & MOB NO" placeholder="Reference Name & Mobile" />
+						</CardContent>
+					</Card>
+
+					{/* Remarks (last section) */}
 					<Card>
 						<CardHeader>
 							<CardTitle>Remarks</CardTitle>
@@ -603,10 +494,7 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 								render={({ field }) => (
 									<FormItem>
 										<FormControl>
-											<Textarea
-												placeholder="Add any additional remarks here..."
-												{...field}
-											/>
+											<Textarea className="bg-white border-gray-300 focus:border-green-500 focus:ring-green-500 focus:ring-1" placeholder="Add any additional remarks here..." {...field} />
 										</FormControl>
 										<FormMessage />
 									</FormItem>
@@ -615,19 +503,12 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 						</CardContent>
 					</Card>
 
-					<div className="flex justify-end">
-						<Button
-							type="submit"
-							disabled={loading}
-							style={{ backgroundColor: "#90EE90", color: "#006400" }}
-						>
-							{loading
-								? lead
-									? "Updating..."
-									: "Submitting..."
-								: lead
-								? "Update Lead"
-								: "Submit Lead"}
+					<div className="flex justify-end gap-3">
+						<Button type="button" className="bg-red-200 text-black hover:bg-red-300" variant="outline" onClick={() => router.back()}>
+							Cancel
+						</Button>
+						<Button type="submit" disabled={loading} className="bg-black text-white hover:bg-gray-800">
+							{loading ? (lead ? "Updating..." : "Submitting...") : lead ? "Update Lead" : "Submit Lead"}
 						</Button>
 					</div>
 				</form>

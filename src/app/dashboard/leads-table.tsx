@@ -106,4 +106,3 @@ export function LeadsTable({ leads }: LeadsTableProps) {
 		</div>
 	);
 }
-
