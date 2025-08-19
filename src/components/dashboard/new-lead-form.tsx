@@ -302,9 +302,7 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 								name="name"
 								label="NAME"
 								placeholder="Full Name"
-								onChange={(e) =>
-									(e.target.value = e.target.value.toUpperCase())
-								}
+								uppercase
 							/>
 							<FormSelect
 								control={form.control}
@@ -360,6 +358,7 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 								name="motherName"
 								label="MOTHER NAME"
 								placeholder="Mother's Name"
+								uppercase
 							/>
 							<FormInput
 								control={form.control}
@@ -385,7 +384,7 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 								<CardTitle>Vehicle Information</CardTitle>
 							</CardHeader>
 							<CardContent className="space-y-4">
-								<FormInput control={form.control} name="rcNo" label="RC NO" placeholder="Vehicle RC No." />
+								<FormInput control={form.control} name="rcNo" label="RC NO" placeholder="Vehicle RC No." uppercase />
 								<FormInput control={form.control} name="vehicleVerient" label="VEHICLE / VERIENT" placeholder="e.g., Maruti Suzuki Swift VXi" />
 								<FormSelect control={form.control} name="mfgYear" label="MFG YEAR" placeholder="Select year" options={withNone(Constants.MFG_YEARS)} />
 								<FormSelect control={form.control} name="osNo" label="O. S NO" placeholder="Select O.S No" options={withNone(Constants.OS_NOS)} />
@@ -399,9 +398,9 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 								<CardTitle>Ref Contact Information</CardTitle>
 							</CardHeader>
 							<CardContent className="space-y-4">
-								<FormInput control={form.control} name="refFirstName" label="FIRST NAME" placeholder="Reference 1 Name" />
+								<FormInput control={form.control} name="refFirstName" label="FIRST NAME" placeholder="Reference 1 Name" uppercase />
 								<FormMobileInput control={form.control} name="refFirstMobNo" label="FIRST MOB NO" placeholder="Reference 1 Mobile" />
-								<FormInput control={form.control} name="refSecondName" label="SECOND NAME" placeholder="Reference 2 Name" />
+								<FormInput control={form.control} name="refSecondName" label="SECOND NAME" placeholder="Reference 2 Name" uppercase />
 								<FormMobileInput control={form.control} name="refSecondMobNo" label="SECOND MOB NO" placeholder="Reference 2 Mobile" />
 							</CardContent>
 						</Card>
@@ -412,7 +411,7 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 							<CardTitle>Nominee Information</CardTitle>
 						</CardHeader>
 						<CardContent className="space-y-4">
-							<FormInput control={form.control} name="nomineeName" label="NOMINEE NAME" placeholder="Nominee's full name" />
+							<FormInput control={form.control} name="nomineeName" label="NOMINEE NAME" placeholder="Nominee's full name" uppercase />
 							<FormDateInput control={form.control} name="nomineeDob" label="NOMINEE Date of Birth" placeholder="DD/MM/YYYY" />
 							<FormSelect control={form.control} name="nomineeRelationship" label="RELATIONSHIP" placeholder="Select relationship" options={withNone(Constants.RELATIONSHIPS)} />
 						</CardContent>

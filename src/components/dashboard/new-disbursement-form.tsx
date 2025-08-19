@@ -210,7 +210,7 @@ export function NewDisbursementForm({ disbursement }: NewDisbursementFormProps) 
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <FormSelect control={form.control} name="profileType" label="TYPE" placeholder="Select type" options={Constants.PROFILE_TYPES} />
-            <FormInput control={form.control} name="name" label="NAME" placeholder="Full Name" onChange={(e) => (e.target.value = e.target.value.toUpperCase())} />
+            <FormInput control={form.control} name="name" label="NAME" placeholder="Full Name" uppercase />
             <FormSelect control={form.control} name="gender" label="GENDER" placeholder="Select gender" options={Constants.GENDERS} />
             <FormSelect control={form.control} name="customerProfile" label="CUSTOMER PROFILE" placeholder="Select profile" options={Constants.CUSTOMER_PROFILES} />
             <FormInput control={form.control} name="panNo" label="PAN NO" placeholder="ABCDE1234F" onChange={(e) => (e.target.value = e.target.value.toUpperCase())} />
@@ -226,7 +226,7 @@ export function NewDisbursementForm({ disbursement }: NewDisbursementFormProps) 
             <CardTitle>Vehicle Information</CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <FormInput control={form.control} name="rcNo" label="RC NO" placeholder="Vehicle RC No." />
+            <FormInput control={form.control} name="rcNo" label="RC NO" placeholder="Vehicle RC No." uppercase />
             <FormInput control={form.control} name="vehicleVerient" label="VEHICLE / VERIENT" placeholder="e.g., Maruti Suzuki Swift VXi" />
             <FormSelect control={form.control} name="mfgYear" label="MFG YEAR" placeholder="Select year" options={Constants.MFG_YEARS} />
             <FormSelect control={form.control} name="osNo" label="O. S NO" placeholder="Select O.S No" options={Constants.OS_NOS} />
@@ -241,8 +241,8 @@ export function NewDisbursementForm({ disbursement }: NewDisbursementFormProps) 
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <FormSelect control={form.control} name="bankFinance" label="BANK / FINANCE" placeholder="Select Bank" options={Constants.BANKS} />
-            <FormInput control={form.control} name="bankFinanceBranch" label="BANK / FINANCE BRANCH" placeholder="Branch name" />
-            <FormInput control={form.control} name="loginExecutiveName" label="LOAN EXECUTIVE NAME" placeholder="Executive's name" />
+            <FormInput control={form.control} name="bankFinanceBranch" label="BANK / FINANCE BRANCH" placeholder="Branch name" uppercase />
+            <FormInput control={form.control} name="loginExecutiveName" label="LOAN EXECUTIVE NAME" placeholder="Executive's name" uppercase />
           </CardContent>
         </Card>
 
@@ -252,7 +252,7 @@ export function NewDisbursementForm({ disbursement }: NewDisbursementFormProps) 
             <CardTitle>Dealer Information</CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <FormInput control={form.control} name="caseDealer" label="CASE DEALER" placeholder="Dealer Name" />
+            <FormInput control={form.control} name="caseDealer" label="CASE DEALER" placeholder="Dealer Name" uppercase />
             <FormInput control={form.control} name="dealerMob" label="DEALER MOB" placeholder="10-digit number" type="tel" />
             <FormField
               control={form.control}

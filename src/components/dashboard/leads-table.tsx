@@ -68,12 +68,14 @@ export function LeadsTable({ leads }: LeadsTableProps) {
 						<TableHead>MOBILE NO</TableHead>
 						<TableHead>STAGE</TableHead>
 						<TableHead>DATE</TableHead>
+						<TableHead>BANK / FINANCE</TableHead>
+						<TableHead>CASE DEALER</TableHead>
 						<TableHead className="text-right">ACTIONS</TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>
 					{leads.map((lead) => (
-						<TableRow key={lead.id}>
+						<TableRow key={lead.id} className="cursor-pointer hover:bg-green-50" onClick={() => router.push(`/dashboard/my-leads/${lead.id}/view`)}>
 							<TableCell className="font-semibold">{lead.loanId || "N/A"}</TableCell>
 							<TableCell className="font-medium">{lead.name || "N/A"}</TableCell>
 							<TableCell>{lead.mobileNo || "N/A"}</TableCell>
@@ -83,19 +85,21 @@ export function LeadsTable({ leads }: LeadsTableProps) {
 								</Badge>
 							</TableCell>
 							<TableCell>{lead.dateTime || "N/A"}</TableCell>
+							<TableCell>{lead.bankFinance || "N/A"}</TableCell>
+							<TableCell>{lead.caseDealer || "N/A"}</TableCell>
 							<TableCell className="text-right space-x-2">
 								<Button
 									variant="ghost"
 									size="sm"
 									className="text-blue-600"
-									onClick={() => router.push(`/dashboard/my-leads/${lead.id}/view`)}
+									onClick={(e) => { e.stopPropagation(); router.push(`/dashboard/my-leads/${lead.id}/view`); }}
 								>
 									View
 								</Button>
 								<Button
 									variant="outline"
 									size="sm"
-									onClick={() => router.push(`/dashboard/my-leads/${lead.id}`)}
+									onClick={(e) => { e.stopPropagation(); router.push(`/dashboard/my-leads/${lead.id}`); }}
 								>
 									Update
 								</Button>

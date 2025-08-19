@@ -88,6 +88,7 @@ interface FormInputProps {
 	className?: string;
 	onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 	onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
+	uppercase?: boolean;
 }
 
 export const FormInput = ({
@@ -100,6 +101,7 @@ export const FormInput = ({
 	className,
 	onChange,
 	onBlur,
+	uppercase = false,
 }: FormInputProps) => (
 	<FormField
 		control={control}
@@ -112,8 +114,11 @@ export const FormInput = ({
 						placeholder={placeholder}
 						type={type}
 						{...field}
-						className={`border-gray-300 focus:border-green-500 focus:ring-green-500 focus:ring-1 text-gray-900 placeholder:text-gray-500 bg-white ${type === 'number' ? '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none' : ''}`}
+						className={`border-gray-300 focus:border-green-500 focus:ring-green-500 focus:ring-1 text-gray-900 placeholder:text-gray-500 bg-white ${uppercase ? 'uppercase' : ''} ${type === 'number' ? '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none' : ''}`}
 						onChange={(e) => {
+							if (uppercase) {
+								e.target.value = e.target.value.toUpperCase();
+							}
 							field.onChange(e);
 							if (onChange) onChange(e);
 						}}

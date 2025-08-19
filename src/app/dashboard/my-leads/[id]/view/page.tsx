@@ -78,6 +78,11 @@ export default function ViewLeadPage({ params }: { params: Promise<{ id: string 
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Leads
           </Button>
+
+        </div>
+        <div className="flex flex-col gap-2 justify-center">
+          <h1 className=" text-center text-3xl font-semibold" >Wheels Web</h1>
+          <h2 className="text-gray-600 text-center" >Used car loans</h2>
         </div>
         <div className="flex items-center justify-between">
           <div>
@@ -201,7 +206,7 @@ export default function ViewLeadPage({ params }: { params: Promise<{ id: string 
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="print:hidden">
           <CardHeader>
             <CardTitle>Dealer & References</CardTitle>
           </CardHeader>

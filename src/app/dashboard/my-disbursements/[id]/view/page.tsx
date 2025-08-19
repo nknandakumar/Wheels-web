@@ -79,6 +79,10 @@ export default function ViewDisbursementPage({ params }: { params: Promise<{ id:
             Back to Disbursements
           </Button>
         </div>
+        <div className="flex flex-col gap-2 justify-center">
+          <h1 className=" text-center text-3xl font-semibold" >Wheels Web</h1>
+          <h2 className="text-gray-600 text-center" >Used car loans</h2>
+        </div>
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold">Disbursement Details</h1>
@@ -97,7 +101,7 @@ export default function ViewDisbursementPage({ params }: { params: Promise<{ id:
             <CardTitle>Basic Information</CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="md:col-span-4">
+            <div className="md:col-span-4 print:hidden">
               <div className="text-xs text-muted-foreground mb-1">LOAN ID TYPE</div>
               <div className="text-sm font-semibold text-green-700 bg-green-50 border border-green-200 rounded px-2 py-1">
                 Auto Generated
@@ -154,7 +158,7 @@ export default function ViewDisbursementPage({ params }: { params: Promise<{ id:
         </Card>
 
         {/* Step 5: Dealer Information */}
-        <Card>
+        <Card className="print:hidden">
           <CardHeader>
             <CardTitle>Dealer Information</CardTitle>
           </CardHeader>

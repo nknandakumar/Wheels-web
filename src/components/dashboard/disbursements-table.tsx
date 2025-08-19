@@ -58,33 +58,39 @@ export function DisbursementsTable({ disbursements }: DisbursementsTableProps) {
         <TableHeader className="bg-green-100 hover:bg-green-100" >
           <TableRow>
             <TableHead>LOAN ID</TableHead>
+            <TableHead>RC NO</TableHead>
             <TableHead>NAME</TableHead>
-            <TableHead>BANK / FINANCE</TableHead>
+            <TableHead>MOBILE NO</TableHead>
             <TableHead>STAGE</TableHead>
             <TableHead>DATE</TableHead>
+            <TableHead>BANK / FINANCE</TableHead>
+            <TableHead>CASE DEALER</TableHead>
             <TableHead className="text-right">ACTIONS</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {disbursements.map((d) => (
-            <TableRow key={d.id}>
+            <TableRow key={d.id} className="cursor-pointer hover:bg-green-50" onClick={() => router.push(`/dashboard/my-disbursements/${d.id}/view`)}>
               <TableCell className="font-semibold">{d.loanId || "N/A"}</TableCell>
+              <TableCell>{d.rcNo || "N/A"}</TableCell>
               <TableCell className="font-medium">{d.name || "N/A"}</TableCell>
-              <TableCell>{d.bankFinance || "N/A"}</TableCell>
+              <TableCell>{d.mobileNo || "N/A"}</TableCell>
               <TableCell>
                 <Badge variant={getBadgeVariant(d.stage)}>{d.stage}</Badge>
               </TableCell>
               <TableCell>{d.dateTime || "N/A"}</TableCell>
+              <TableCell>{d.bankFinance || "N/A"}</TableCell>
+              <TableCell>{d.caseDealer || "N/A"}</TableCell>
               <TableCell className="text-right space-x-2">
                 <Button
                   variant="ghost"
                   size="sm"
                   className="text-blue-600"
-                  onClick={() => router.push(`/dashboard/my-disbursements/${d.id}/view`)}
+                  onClick={(e) => { e.stopPropagation(); router.push(`/dashboard/my-disbursements/${d.id}/view`); }}
                 >
                   View
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => router.push(`/dashboard/my-disbursements/${d.id}`)}>
+                <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); router.push(`/dashboard/my-disbursements/${d.id}`); }}>
                   Update
                 </Button>
                 <AlertDialog>

@@ -43,9 +43,9 @@ export function ActionCard({
 			onClick={handleNavigate}
 			onKeyDown={handleKeyDown}
 		>
-			<Card className="h-48 lg:h-56 rounded-3xl transition-all border-4 border-black  hover:shadow-2xl bg-[#E8FBF2] hover:border-gray-600 bg-[#FD9D28] ">
+			<Card className="h-48 lg:h-56 rounded-3xl transition-all border-4 border-gray-300  hover:shadow-2xl bg-[#E8FBF2] hover:border-gray- bg-[#142F45] text-white ">
 				<CardHeader className="space-y-3">
-					<Icon className="h-7 w-7 text-gray-900" />
+					<Icon className="h-7 w-7 text-[#FF5E15]" />
 					<CardTitle className="text-2xl flex font-semibold font-headline">
 						{title}
 					</CardTitle>

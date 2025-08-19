@@ -17,20 +17,7 @@ export default function DashboardPage() {
 
 	return (
 		<div className="min-h-screen bg-green-100 flex flex-col">
-			<header className="sticky top-0 z-10 border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-				<div className="mx-auto w-full max-w-6xl px-4 py-3 flex items-center justify-between">
-					<div className="text-lg sm:text-xl font-semibold tracking-tight">
-						Wheels Web
-					</div>
-					<Button
-						variant="outline"
-						className="bg-black text-white hover:bg-gray-800 hover:text-white rounded-full px-4 py-2 h-9"
-						onClick={handleLogout}
-					>
-						Logout
-					</Button>
-				</div>
-			</header>
+
 
 			<main className="flex-1">
 				<div className="mx-auto w-full max-w-6xl px-4 py-10">

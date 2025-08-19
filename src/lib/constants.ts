@@ -3,7 +3,7 @@ const createOptions = (items: string[]) => items.map(item => ({ label: item, val
 
 export const SOURCES = createOptions(["Self", "Dealer", "Bank","UC Showroom ","NC Showroom","Others"]);
 export const STAGES = createOptions(["Lead", "Cibil", "Login", "Sanction", "Disbursed","Rejected"]);
-export const PROFILE_TYPES = createOptions(["Sale Purchase", "Refinance", "Int Refinance", "Balance Transfer", "BT + Topup","Topup", "Int Topup"]);
+export const PROFILE_TYPES = createOptions(["Sale Purchase", "Refinance", "Int Refinance", "Balance Transfer", "BT + Topup", "Int Topup"]);
 export const GENDERS = createOptions(["Male", "Female", "Other"]);
 export const CUSTOMER_PROFILES = createOptions(["Self-Employed", "Salaried", "ITR", "Agriculture","Govt Employed","Pensioner","Other"]);
 export const MARITAL_STATUSES = createOptions(["Un-married", "Married", "Married with Kids"]);
