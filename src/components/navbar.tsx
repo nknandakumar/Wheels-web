@@ -19,7 +19,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-14 bg-white border-b shadow-sm z-50 bg-[#142F45]
+    <header className="fixed top-0 left-0 right-0 h-14  border-b shadow-sm z-50 bg-[#142F45]
       print:static print:h-auto print:bg-white print:shadow-none print:border-0">
       <div className="mx-auto max-w-screen-2xl h-full px-4 flex items-center justify-between">
         <div className="text-lg font-semibold text-white tracking-wide print:text-black">Wheels Web</div>

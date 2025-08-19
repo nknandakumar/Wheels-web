@@ -81,7 +81,7 @@ export default function ViewLeadPage({ params }: { params: Promise<{ id: string 
 
         </div>
         <div className="flex flex-col gap-2 justify-center">
-          <h1 className=" text-center text-3xl font-semibold" >Wheels Web</h1>
+          <h1 className=" text-center text-3xl font-semibold underline" >Wheels Web</h1>
           <h2 className="text-gray-600 text-center" >Used car loans</h2>
         </div>
         <div className="flex items-center justify-between">
@@ -134,7 +134,7 @@ export default function ViewLeadPage({ params }: { params: Promise<{ id: string 
 
         <Card>
           <CardHeader>
-            <CardTitle>Vehicle</CardTitle>
+            <CardTitle>Vehicle Information</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -149,9 +149,43 @@ export default function ViewLeadPage({ params }: { params: Promise<{ id: string 
           </CardContent>
         </Card>
 
+        {/* Addresses moved after Nominee as per requested flow */}
+
+        {/* Bank / Finance moved after Addresses as per requested flow */}
+
+
+        {/* References (visible on print) */}
         <Card>
           <CardHeader>
-            <CardTitle>Addresses</CardTitle>
+            <CardTitle>References Information</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Field label="Ref 1 Name" value={lead.refFirstName} />
+              <Field label="Ref 1 Mobile" value={lead.refFirstMobNo} />
+              <Field label="Ref 2 Name" value={lead.refSecondName} />
+              <Field label="Ref 2 Mobile" value={lead.refSecondMobNo} />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Nominee Information</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Field label="Nominee Name" value={lead.nomineeName} />
+              <Field label="Nominee DOB" value={lead.nomineeDob} />
+              <Field label="Relationship" value={lead.nomineeRelationship} />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Addresses (now after Nominee) */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Addresses Information</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -193,9 +227,10 @@ export default function ViewLeadPage({ params }: { params: Promise<{ id: string 
           </CardContent>
         </Card>
 
+        {/* Bank / Finance (now after Addresses) */}
         <Card>
           <CardHeader>
-            <CardTitle>Bank / Finance</CardTitle>
+            <CardTitle>Bank / Finance Information</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -206,35 +241,18 @@ export default function ViewLeadPage({ params }: { params: Promise<{ id: string 
           </CardContent>
         </Card>
 
+        {/* Dealer Information (hidden on print) */}
         <Card className="print:hidden">
           <CardHeader>
-            <CardTitle>Dealer & References</CardTitle>
+            <CardTitle>Dealer Information</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Field label="Case Dealer" value={lead.caseDealer} />
               <Field label="Ref Name & Mob No" value={lead.refNameMobNo} />
-              <Field label="Ref 1 Name" value={lead.refFirstName} />
-              <Field label="Ref 1 Mobile" value={lead.refFirstMobNo} />
-              <Field label="Ref 2 Name" value={lead.refSecondName} />
-              <Field label="Ref 2 Mobile" value={lead.refSecondMobNo} />
             </div>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Nominee</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Field label="Nominee Name" value={lead.nomineeName} />
-              <Field label="Nominee DOB" value={lead.nomineeDob} />
-              <Field label="Relationship" value={lead.nomineeRelationship} />
-            </div>
-          </CardContent>
-        </Card>
-
         <Card>
           <CardHeader>
             <CardTitle>Remarks</CardTitle>

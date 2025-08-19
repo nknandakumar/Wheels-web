@@ -80,7 +80,7 @@ export default function ViewDisbursementPage({ params }: { params: Promise<{ id:
           </Button>
         </div>
         <div className="flex flex-col gap-2 justify-center">
-          <h1 className=" text-center text-3xl font-semibold" >Wheels Web</h1>
+          <h1 className=" text-center text-3xl font-semibold underline " >Wheels Web</h1>
           <h2 className="text-gray-600 text-center" >Used car loans</h2>
         </div>
         <div className="flex items-center justify-between">
