@@ -28,7 +28,7 @@ export function NewDisbursementForm({ disbursement }: NewDisbursementFormProps) 
 
   const form = useForm<Disbursement>({
     resolver: zodResolver(DisbursementSchema),
-    defaultValues: disbursement || {
+    defaultValues: disbursement ? disbursement : {
       id: crypto.randomUUID(),
       loanId: "",
       dateTime: "",
@@ -52,19 +52,19 @@ export function NewDisbursementForm({ disbursement }: NewDisbursementFormProps) 
       osNo: "",
       kilometreReading: "",
       vehicleOwnerContactNo: "",
-      totalLoanAmount: 0,
-      pfCharges: 0,
-      documentationCharges: 0,
-      loanInsuranceCharges: 0,
-      otherCharges: 0,
-      rtoCharges: 0,
+      totalLoanAmount: undefined,
+      pfCharges: undefined,
+      documentationCharges: undefined,
+      loanInsuranceCharges: undefined,
+      otherCharges: undefined,
+      rtoCharges: undefined,
       netLoanAmount: 0,
       tenure: "",
       irr: "",
       emiAmount: "",
       emiDate: "",
-      transaction1: 0,
-      transaction2: 0,
+      transaction1: undefined,
+      transaction2: undefined,
       remarksForHold: "",
       utr: "",
       caseDealer: "",
@@ -88,6 +88,7 @@ export function NewDisbursementForm({ disbursement }: NewDisbursementFormProps) 
       if (loanIdType === "auto") {
         setValue("loanId", getNextLoanId());
       }
+      // Prefill display with current date & time; will be updated at submission
       setValue("dateTime", new Date().toLocaleString());
     }
   }, [disbursement, setValue, loanIdType]);
@@ -97,19 +98,42 @@ export function NewDisbursementForm({ disbursement }: NewDisbursementFormProps) 
     setValue("netLoanAmount", net);
   }, [totalLoanAmount, pfCharges, documentationCharges, loanInsuranceCharges, otherCharges, rtoCharges, setValue]);
 
-  const onSubmit = (data: Disbursement) => {
+  const onSubmit = async (data: Disbursement) => {
+    console.log("onSubmit function called");
+    console.log("Form errors:", form.formState.errors);
+    console.log("Form is valid:", form.formState.isValid);
+    
     setLoading(true);
     try {
+      console.log("Disbursement form submission started");
+      console.log("Is edit mode:", !!disbursement);
+      console.log("Disbursement ID:", disbursement?.id);
+      console.log("Form data ID:", data.id);
+      
+      // Set submitted date & time just before saving
+      data.dateTime = new Date().toLocaleString();
+      
       if (disbursement) {
-        updateDisbursement(data);
+        console.log("Calling updateDisbursement with:", data);
+        await updateDisbursement(data);
+        console.log("updateDisbursement completed successfully");
         toast({ title: "Success", description: "Disbursement updated successfully." });
+        router.push(`/dashboard/my-disbursements/${data.id}/view`);
       } else {
-        saveDisbursement(data);
+        console.log("Calling saveDisbursement with:", data);
+        await saveDisbursement(data);
+        console.log("saveDisbursement completed successfully");
         toast({ title: "Success", description: "New disbursement created." });
+        router.push("/dashboard/my-disbursements");
       }
-      router.push("/dashboard/my-disbursements");
     } catch (error) {
-      toast({ variant: "destructive", title: "Error", description: "Failed to save disbursement." });
+      console.error("Failed to save disbursement:", error);
+      const message = error instanceof Error ? error.message : "Failed to save disbursement.";
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: message,
+      });
       setLoading(false);
     }
   };
@@ -117,13 +141,8 @@ export function NewDisbursementForm({ disbursement }: NewDisbursementFormProps) 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        {/* Top Back Button */}
-        <div className="flex justify-between items-center">
-          <Button type="button" variant="outline" onClick={() => router.back()}>
-            Back
-          </Button>
-        </div>
-
+    
+    
         {/* Step 1: Basic Information */}
         <Card>
           <CardHeader>
@@ -323,7 +342,29 @@ export function NewDisbursementForm({ disbursement }: NewDisbursementFormProps) 
           <Button type="button" className="bg-red-200 text-black hover:bg-red-300" variant="outline" onClick={() => router.back()}>
             Cancel
           </Button>
-          <Button type="submit" disabled={loading} className="bg-black text-white hover:bg-gray-800">
+          <Button 
+            type="button" 
+            disabled={loading} 
+            className="bg-black text-white hover:bg-gray-800"
+            onClick={async () => {
+              console.log("Submit button clicked");
+              const isValid = await form.trigger();
+              console.log("Form validation result:", isValid);
+              console.log("Form errors:", form.formState.errors);
+              console.log("Detailed errors:", JSON.stringify(form.formState.errors, null, 2));
+              
+              // Show specific field errors
+              Object.keys(form.formState.errors).forEach(field => {
+                console.log(`Error in field "${field}":`, (form.formState.errors as any)[field]);
+              });
+              
+              if (isValid) {
+                form.handleSubmit(onSubmit)();
+              } else {
+                console.log("Form validation failed - not submitting");
+              }
+            }}
+          >
             {loading ? (disbursement ? "Updating..." : "Submitting...") : (disbursement ? "Update Disbursement" : "Submit Disbursement")}
           </Button>
         </div>

@@ -1,12 +1,16 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { getLeads, getLeadsCount } from "@/lib/data";
 import type { Lead } from "@/lib/schemas";
 import { LeadsTable } from "@/components/dashboard/leads-table";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 export default function MyLeadsPage() {
+	const router = useRouter();
 	const [leads, setLeads] = useState<Lead[]>([]);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [loading, setLoading] = useState(true);
@@ -35,26 +39,46 @@ export default function MyLeadsPage() {
 	}, [page]);
 
 	const filteredLeads = useMemo(() => {
-		if (!searchTerm) {
-			return leads;
-		}
-		return leads.filter((lead) =>
-			Object.values(lead).some((value) =>
-				String(value).toLowerCase().includes(searchTerm.toLowerCase())
-			)
-		);
+		const base = !searchTerm
+			? leads
+			: leads.filter((lead) =>
+					Object.values(lead).some((value) =>
+						String(value).toLowerCase().includes(searchTerm.toLowerCase())
+					)
+			  );
+		// Sort by dateTime (most recent first)
+		return [...base].sort((a, b) => {
+			const ta = a.dateTime ? Date.parse(a.dateTime) : 0;
+			const tb = b.dateTime ? Date.parse(b.dateTime) : 0;
+			return tb - ta;
+		});
 	}, [leads, searchTerm]);
 
 	return (
 		<div className="flex flex-col h-full p-6">
-			<header className="mb-6 flex justify-between items-center">
-				<h1 className="text-2xl font-bold">My Leads</h1>
-				<div className="w-full max-w-sm">
-					<Input
-						placeholder="Find Case details..."
-						value={searchTerm}
-						onChange={(e) => setSearchTerm(e.target.value)}
-					/>
+			<header className="mb-6">
+				<div className="flex items-center gap-4 mb-4">
+					<Button
+						variant="ghost"
+						size="sm"
+						onClick={() => router.push("/dashboard")}
+						className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+					>
+						<ArrowLeft className="h-4 w-4" />
+						Back to Dashboard
+					</Button>
+				</div>
+				<hr className="my-4 px-0 mx-0 border-gray-400" />
+				<div className="flex justify-between flex-col md:flex-row items-center">
+					<h1 className="text-2xl font-bold">My Leads</h1>
+					<div className="w-full flex gap-2 justify-baseline max-w-sm">
+						<Input
+							placeholder="Search 🔍"
+							value={searchTerm}
+							onChange={(e) => setSearchTerm(e.target.value)}
+							className="bg-green-100 border border-green-500"
+						/>
+					</div>
 				</div>
 			</header>
 			<main className="flex-1">

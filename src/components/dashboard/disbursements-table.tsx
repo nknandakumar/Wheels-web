@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -12,6 +13,15 @@ import {
 import { Button } from "@/components/ui/button";
 import type { Disbursement } from "@/lib/schemas";
 import { Badge } from "@/components/ui/badge";
+import { deleteDisbursement } from "@/lib/data";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 
 interface DisbursementsTableProps {
   disbursements: Disbursement[];
@@ -19,6 +29,8 @@ interface DisbursementsTableProps {
 
 export function DisbursementsTable({ disbursements }: DisbursementsTableProps) {
   const router = useRouter();
+  const { toast } = useToast();
+  const [toDeleteId, setToDeleteId] = useState<string | null>(null);
 
   if (disbursements.length === 0) {
     return (
@@ -43,32 +55,84 @@ export function DisbursementsTable({ disbursements }: DisbursementsTableProps) {
   return (
     <div className="border rounded-lg">
       <Table>
-        <TableHeader>
+        <TableHeader className="bg-green-100 hover:bg-green-100" >
           <TableRow>
-            <TableHead>Date & Time</TableHead>
-            <TableHead>Loan ID</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Bank / Finance</TableHead>
-            <TableHead>Total Loan</TableHead>
-            <TableHead>Stage</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead>LOAN ID</TableHead>
+            <TableHead>NAME</TableHead>
+            <TableHead>BANK / FINANCE</TableHead>
+            <TableHead>STAGE</TableHead>
+            <TableHead>DATE</TableHead>
+            <TableHead className="text-right">ACTIONS</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {disbursements.map((d) => (
             <TableRow key={d.id}>
-              <TableCell>{d.dateTime}</TableCell>
-              <TableCell>{d.loanId}</TableCell>
-              <TableCell className="font-medium">{d.name}</TableCell>
-              <TableCell>{d.bankFinance}</TableCell>
-              <TableCell>{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(d.totalLoanAmount)}</TableCell>
-               <TableCell>
+              <TableCell className="font-semibold">{d.loanId || "N/A"}</TableCell>
+              <TableCell className="font-medium">{d.name || "N/A"}</TableCell>
+              <TableCell>{d.bankFinance || "N/A"}</TableCell>
+              <TableCell>
                 <Badge variant={getBadgeVariant(d.stage)}>{d.stage}</Badge>
               </TableCell>
-              <TableCell className="text-right">
-                <Button variant="outline" size="sm" onClick={() => router.push(`/dashboard/my-disbursements/${d.id}`)}>
-                  View/Edit
+              <TableCell>{d.dateTime || "N/A"}</TableCell>
+              <TableCell className="text-right space-x-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-blue-600"
+                  onClick={() => router.push(`/dashboard/my-disbursements/${d.id}/view`)}
+                >
+                  View
                 </Button>
+                <Button variant="outline" size="sm" onClick={() => router.push(`/dashboard/my-disbursements/${d.id}`)}>
+                  Update
+                </Button>
+                <AlertDialog>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" aria-label="More">⋯</Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <AlertDialogTrigger asChild>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setToDeleteId(d.id);
+                            toast({ variant: "destructive", title: "Delete Disbursement?", description: "This action cannot be undone." });
+                          }}
+                        >
+                          Delete
+                        </DropdownMenuItem>
+                      </AlertDialogTrigger>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will permanently delete this disbursement.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={async () => {
+                          if (!toDeleteId) return;
+                          try {
+                            await deleteDisbursement(toDeleteId);
+                            toast({ title: "Deleted", description: "Disbursement removed." });
+                            router.refresh?.();
+                          } catch (e) {
+                            toast({ variant: "destructive", title: "Error", description: "Failed to delete disbursement." });
+                          } finally {
+                            setToDeleteId(null);
+                          }
+                        }}
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </TableCell>
             </TableRow>
           ))}

@@ -1,25 +1,36 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, use as usePromise } from "react";
 import { getDisbursementById } from "@/lib/data";
 import { type Disbursement } from "@/lib/schemas";
 import { NewDisbursementForm } from "@/components/dashboard/new-disbursement-form";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function EditDisbursementPage({ params }: { params: { id: string } }) {
+export default function EditDisbursementPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = usePromise(params);
   const [disbursement, setDisbursement] = useState<Disbursement | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const data = getDisbursementById(params.id);
-    if (data) {
-      setDisbursement(data);
-    } else {
-      setError("Disbursement not found.");
-    }
-    setLoading(false);
-  }, [params.id]);
+    const fetchDisbursement = async () => {
+      try {
+        setLoading(true);
+        const data = await getDisbursementById(id);
+        if (data) {
+          setDisbursement(data);
+        } else {
+          setError("Disbursement not found.");
+        }
+      } catch (e) {
+        console.error("Error fetching disbursement:", e);
+        setError("Failed to load disbursement.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDisbursement();
+  }, [id]);
 
   if (loading) {
     return (

@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Lead } from "@/types/lead";
 import { Badge } from "@/components/ui/badge";
-
+import {Button} from "@/components/ui/button"
 interface LeadsTableProps {
 	leads: Lead[];
 }

@@ -56,7 +56,7 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 
 	const form = useForm<Lead>({
 		resolver: zodResolver(LeadSchema),
-		defaultValues: lead || {
+		defaultValues: lead ? lead : {
 			id: crypto.randomUUID(),
 			loanId: "",
 			dateTime: "",
@@ -72,7 +72,7 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 			altMobileNo: "",
 			email: "",
 			motherName: "",
-			loanAmount: 0,
+			loanAmount: undefined,
 			dsa: "",
 			rcNo: "",
 			vehicleVerient: "",
@@ -109,7 +109,7 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 	});
 
 	const [loanIdType, setLoanIdType] = useState<"manual" | "auto">("auto");
-	const [currentDate] = useState(new Date().toLocaleDateString());
+	// Prefill with current date & time for display; will be updated at submission
 
 	const { watch, setValue } = form;
 
@@ -125,9 +125,9 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 			if (loanIdType === "auto") {
 				setValue("loanId", getNextLoanId());
 			}
-			setValue("dateTime", currentDate);
+			setValue("dateTime", new Date().toLocaleString());
 		}
-	}, [lead, setValue, loanIdType, currentDate]);
+	}, [lead, setValue, loanIdType]);
 
 	useEffect(() => {
 		if (isCurrentAddressSame) {
@@ -156,21 +156,40 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 	]);
 
 	const onSubmit = async (data: Lead) => {
+		console.log("Lead onSubmit function called");
+		console.log("Form errors:", form.formState.errors);
+		console.log("Form is valid:", form.formState.isValid);
+		
 		setLoading(true);
 		try {
+			console.log("Form submission started");
+			console.log("Is edit mode:", !!lead);
+			console.log("Lead ID:", lead?.id);
+			console.log("Form data ID:", data.id);
+			
+			// Set submitted date & time just before saving
+			data.dateTime = new Date().toLocaleString();
+			
 			if (lead) {
+				console.log("Calling updateLead with:", data);
 				await updateLead(data);
+				console.log("updateLead completed successfully");
 				toast({ title: "Success", description: "Lead updated successfully." });
+				router.push(`/dashboard/my-leads/${data.id}/view`);
 			} else {
+				console.log("Calling saveLead with:", data);
 				await saveLead(data);
+				console.log("saveLead completed successfully");
 				toast({ title: "Success", description: "New lead created." });
+				router.push("/dashboard/my-leads");
 			}
-			router.push("/dashboard/my-leads");
 		} catch (error) {
+			console.error("Failed to save lead:", error);
+			const message = error instanceof Error ? error.message : "Failed to save lead.";
 			toast({
 				variant: "destructive",
 				title: "Error",
-				description: "Failed to save lead.",
+				description: message,
 			});
 			setLoading(false);
 		}
@@ -225,7 +244,9 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 										<Input
 											{...field}
 											readOnly={loanIdType === "auto"}
-											className={`$${loanIdType === "auto" ? "bg-gray-100" : "bg-white"} border-gray-300 focus:border-green-500 focus:ring-green-500 focus:ring-1`}
+											className={`${
+												loanIdType === "auto" ? "bg-gray-100" : "bg-white"
+											} border-gray-300 focus:border-green-500 focus:ring-green-500 focus:ring-1`}
 										/>
 									</FormControl>
 								</FormItem>
@@ -236,7 +257,7 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 							name="dateTime"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>DATE</FormLabel>
+									<FormLabel>DATE & TIME</FormLabel>
 									<FormControl>
 										<Input
 											{...field}
@@ -507,7 +528,20 @@ export function NewLeadForm({ lead }: NewLeadFormProps) {
 						<Button type="button" className="bg-red-200 text-black hover:bg-red-300" variant="outline" onClick={() => router.back()}>
 							Cancel
 						</Button>
-						<Button type="submit" disabled={loading} className="bg-black text-white hover:bg-gray-800">
+						<Button 
+							type="button" 
+							disabled={loading} 
+							className="bg-black text-white hover:bg-gray-800"
+							onClick={async () => {
+								console.log("Lead submit button clicked");
+								const isValid = await form.trigger();
+								console.log("Lead form validation result:", isValid);
+								console.log("Lead form errors:", form.formState.errors);
+								if (isValid) {
+									form.handleSubmit(onSubmit)();
+								}
+							}}
+						>
 							{loading ? (lead ? "Updating..." : "Submitting...") : lead ? "Update Lead" : "Submit Lead"}
 						</Button>
 					</div>

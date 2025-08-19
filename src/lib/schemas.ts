@@ -20,7 +20,7 @@ export const LeadSchema = z.object({
   altMobileNo: z.string().optional(),
   email: requiredString("Email is required").email(),
   motherName: z.string().optional(),
-  loanAmount: z.preprocess((a) => parseInt(z.string().parse(a), 10), 
+  loanAmount: z.preprocess((a) => typeof a === 'number' ? a : parseInt(String(a) || '', 10), 
     z.number({ required_error: "Loan amount is required" }).positive("Must be a positive number")),
   dsa: requiredString("DSA is required"),
 
@@ -126,12 +126,12 @@ export const DisbursementSchema = z.object({
   vehicleOwnerContactNo: requiredString("Vehicle owner contact no. is required"),
 
   // Loan Information
-  totalLoanAmount: z.preprocess((a) => parseFloat(z.string().parse(a)), z.number({ required_error: "Total loan amount is required" }).positive()),
-  pfCharges: z.preprocess((a) => parseFloat(z.string().parse(a)), z.number().nonnegative().optional().default(0)),
-  documentationCharges: z.preprocess((a) => parseFloat(z.string().parse(a)), z.number().nonnegative().optional().default(0)),
-  loanInsuranceCharges: z.preprocess((a) => parseFloat(z.string().parse(a)), z.number().nonnegative().optional().default(0)),
-  otherCharges: z.preprocess((a) => parseFloat(z.string().parse(a)), z.number().nonnegative().optional().default(0)),
-  rtoCharges: z.preprocess((a) => parseFloat(z.string().parse(a)), z.number().nonnegative().optional().default(0)),
+  totalLoanAmount: z.preprocess((a) => typeof a === 'number' ? a : parseFloat(String(a) || ''), z.number({ required_error: "Total loan amount is required" }).positive()),
+  pfCharges: z.preprocess((a) => typeof a === 'number' ? a : parseFloat(String(a) || ''), z.number().nonnegative().optional()),
+  documentationCharges: z.preprocess((a) => typeof a === 'number' ? a : parseFloat(String(a) || ''), z.number().nonnegative().optional()),
+  loanInsuranceCharges: z.preprocess((a) => typeof a === 'number' ? a : parseFloat(String(a) || ''), z.number().nonnegative().optional()),
+  otherCharges: z.preprocess((a) => typeof a === 'number' ? a : parseFloat(String(a) || ''), z.number().nonnegative().optional()),
+  rtoCharges: z.preprocess((a) => typeof a === 'number' ? a : parseFloat(String(a) || ''), z.number().nonnegative().optional()),
   netLoanAmount: z.number(),
 
   // Break-up Information
@@ -141,8 +141,8 @@ export const DisbursementSchema = z.object({
   emiDate: requiredString("EMI Date is required"),
 
   // Payment Details
-  transaction1: z.preprocess((a) => parseFloat(z.string().parse(a)), z.number({ required_error: "Transaction 1 is required" }).nonnegative()),
-  transaction2: z.preprocess((a) => parseFloat(z.string().parse(a)), z.number().nonnegative().optional()),
+  transaction1: z.preprocess((a) => typeof a === 'number' ? a : parseFloat(String(a) || ''), z.number({ required_error: "Transaction 1 is required" }).nonnegative()),
+  transaction2: z.preprocess((a) => typeof a === 'number' ? a : parseFloat(String(a) || ''), z.number().nonnegative().optional()),
   remarksForHold: z.string().optional(),
   utr: z.string().optional(),
 
