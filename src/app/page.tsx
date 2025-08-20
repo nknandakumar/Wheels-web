@@ -1,133 +1,105 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
-} from "@/components/ui/form";
-import { useToast } from "@/hooks/use-toast";
-import { Car } from "lucide-react";
-
-const loginSchema = z.object({
-	username: z.string().min(1, { message: "Username is required" }),
-	password: z.string().min(1, { message: "Password is required" }),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
+import { Label } from "@/components/ui/label";
+import { login, getSession } from "@/lib/auth";
 
 export default function LoginPage() {
-	const router = useRouter();
-	const { toast } = useToast();
-	const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const [role, setRole] = useState<"user" | "admin">("user");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
-	const form = useForm<LoginFormValues>({
-		resolver: zodResolver(loginSchema),
-		defaultValues: {
-			username: "",
-			password: "",
-		},
-	});
+  useEffect(() => {
+    const s = getSession();
+    if (s) {
+      router.replace(s.role === "admin" ? "/admin" : "/dashboard");
+    }
+  }, [router]);
 
-	const onSubmit = (data: LoginFormValues) => {
-		setLoading(true);
-		if (data.username === "abhishek_m" && data.password === "Abhi@571") {
-			if (typeof window !== "undefined") {
-				localStorage.setItem("isAuthenticated", "true");
-			}
-			toast({
-				title: "Login Successful",
-				description: "Welcome to Wheels Web!",
-			});
-			setTimeout(() => {
-				router.push("/dashboard");
-			}, 100); // Short delay for UX, but almost instant
-		} else {
-			toast({
-				variant: "destructive",
-				title: "Login Failed",
-				description: "Invalid username or password.",
-			});
-			setLoading(false);
-		}
-	};
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const res = login(role, username, password);
+    if (res.ok) {
+      router.push(role === "admin" ? "/admin" : "/dashboard");
+    } else {
+      setError(res.error || "Login failed");
+    }
+  };
 
-	return (
-		<main className="flex min-h-screen flex-col items-center justify-center p-4 bg-background">
-			<Card className="w-full max-w-sm shadow-2xl">
-				<CardHeader className="text-center">
-					<div className="mx-auto bg-primary text-primary-foreground p-3 rounded-full mb-4 w-fit">
-						<Car className="h-8 w-8" />
-					</div>
-					<CardTitle className="text-3xl font-bold text-primary">
-						Wheels Web
-					</CardTitle>
-					<CardDescription>
-						Enter your credentials to access your account
-					</CardDescription>
-				</CardHeader>
-				<CardContent>
-					<Form {...form}>
-						<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-							<FormField
-								control={form.control}
-								name="username"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Username</FormLabel>
-										<FormControl>
-											<Input placeholder="Username" {...field} />
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name="password"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Password</FormLabel>
-										<FormControl>
-											<Input
-												type="password"
-												placeholder="Password"
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<Button
-								type="submit"
-								className="w-full"
-								disabled={loading}
-								style={{ backgroundColor: "#90EE90", color: "#006400" }}
-							>
-								{loading ? "Signing In..." : "Sign In"}
-							</Button>
-						</form>
-					</Form>
-				</CardContent>
-			</Card>
-		</main>
-	);
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-4">
+       <div className="text-center space-y-1 mb-6">
+          <div className="text-3xl md:text-6xl font-bold  tracking-tight">Wheels Web</div>
+         
+        </div>
+      <div className="w-full max-w-md bg-white rounded-lg shadow p-6 space-y-6">
+      <h1 className="text-xl font-semibold">Sign in</h1>
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="role">Role</Label>
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant={role === "user" ? "default" : "outline"}
+                onClick={() => setRole("user")}
+                size="sm"
+              >
+                User
+              </Button>
+              <Button
+                type="button"
+                variant={role === "admin" ? "default" : "outline"}
+                onClick={() => setRole("admin")}
+                size="sm"
+              >
+                Admin
+              </Button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="username">Username</Label>
+            <Input
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder={role === "admin" ? "admin@example.com" : "user@example.com"}
+              autoComplete="username"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder={role === "admin" ? "admin123" : "user123"}
+              autoComplete="current-password"
+            />
+          </div>
+
+          {error ? (
+            <div className="text-sm text-red-600">{error}</div>
+          ) : null}
+
+          <Button type="submit" className="w-full">
+            Sign in
+          </Button>
+        </form>
+
+        <div className="text-xs text-muted-foreground">
+          For demo:
+          <div>Admin: admin@example.com / admin123</div>
+          <div>User: user@example.com / user123</div>
+        </div>
+      </div>
+    </div>
+  );
 }

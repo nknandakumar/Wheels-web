@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { logout } from "@/lib/auth";
 
 export default function Navbar() {
   const router = useRouter();
@@ -14,7 +15,8 @@ export default function Navbar() {
       // noop
     } finally {
       // Redirect to login or home; adjust as per your auth flow
-      router.push("/login");
+      logout();
+      router.push("/");
     }
   };
 
